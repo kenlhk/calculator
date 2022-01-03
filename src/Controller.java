@@ -5,10 +5,10 @@ import java.awt.event.ActionListener;
 public class Controller {
     private Model model;
     private View view;
-    private String entry = "0";
-    private String expression = "";
     private String operation = "";
-    private float firstNumber, secondNumber = 0;
+    private String firstNumberString = "0", secondNumberString = "";
+    private float firstNumber;
+    private float secondNumber;
 
     public Controller(Model model, View view) {
         this.model = model;
@@ -20,53 +20,95 @@ public class Controller {
         for (JButton button : view.getNumberButton()) {
             view.addAction(button, new numberButtonListener());
         }
-        view.addAction(view.getDotButton(), new dotButtonListener());
         view.addAction(view.getPlusMinusButton(), new plusMinusButtonListener());
+        view.addAction(view.getDotButton(), new dotButtonListener());
         view.addAction(view.getAddButton(), new operationButtonListener());
         view.addAction(view.getSubtractButton(), new operationButtonListener());
         view.addAction(view.getMultiplyButton(), new operationButtonListener());
         view.addAction(view.getDivideButton(), new operationButtonListener());
+        view.addAction(view.getEqualButton(), new equalButtonListener());
+        view.addAction(view.getClearButton(), new clearButtonListener());
+        view.addAction(view.getClearEntryButton(), new clearEntryButtonListener());
+        view.addAction(view.getBackspaceButton(), new blackSpaceButtonListener());
 
     }
 
     public class numberButtonListener implements ActionListener {
 
+        private ActionEvent e;
+
         @Override
         public void actionPerformed(ActionEvent e) {
+            this.e = e;
+            if (operation.equals("")) {
+                firstNumberString = concatNumberString(firstNumberString);
+            } else {
+                secondNumberString = concatNumberString(secondNumberString);
+            }
+            view.setDisplay(getExpression());
+        }
+
+        public String concatNumberString(String s) {
             //Ensure entry not start with zero
-            if (entry.equals("0")) {
+            if (s.equals("0")) {
                 if (!e.getActionCommand().equals("0")) {
-                    entry = "";
-                    entry += e.getActionCommand();
+                    s = "";
+                    s += e.getActionCommand();
                 }
             } else {
-                entry += e.getActionCommand();
+                s += e.getActionCommand();
             }
-            view.setDisplay(entry);
+            return s;
         }
     }
 
     public class plusMinusButtonListener implements ActionListener {
 
+        private ActionEvent e;
+
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (entry.contains("-")) {
-                entry = entry.substring(1);
+            this.e = e;
+            if (operation.equals("")) {
+                firstNumberString = toggleMinus(firstNumberString);
             } else {
-                entry = "-" + entry;
+                secondNumberString = toggleMinus(secondNumberString);
             }
-            view.setDisplay(entry);
+            view.setDisplay(getExpression());
+        }
+
+        public String toggleMinus(String s) {
+            if (!s.equals("0") && !s.equals("")) {
+                if (s.contains("-")) {
+                    s = s.substring(1);
+                } else {
+                    s = "-" + s;
+                }
+            }
+            return s;
         }
     }
 
+
     public class dotButtonListener implements ActionListener {
+
+        private ActionEvent e;
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (!entry.contains(".")) {
-                entry += ".";
-                view.setDisplay(entry);
+            if (operation.equals("")) {
+                firstNumberString = addDecimal(firstNumberString);
+            } else {
+                secondNumberString = addDecimal(secondNumberString);
             }
+            view.setDisplay(getExpression());
+        }
+
+        public String addDecimal(String s) {
+            if (!s.contains(".")) {
+                s += ".";
+            }
+            return s;
         }
     }
 
@@ -74,47 +116,117 @@ public class Controller {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (entry.matches(".*[+\\-x÷].*")) {
-                firstNumber = Float.parseFloat(entry.split("[+\\-x÷]")[0]);
-                secondNumber = Float.parseFloat(entry.split("[+\\-x÷]")[1]);
-                switch (e.getActionCommand()) {
-                    case ("+"):
-                        firstNumber = model.addition(firstNumber,secondNumber);
-                        break;
-                    case ("-"):
-                        firstNumber = model.subtraction(firstNumber,secondNumber);
-                        break;
-                    case ("x"):
-                        firstNumber = model.multiplication(firstNumber,secondNumber);
-                        break;
-                    case ("÷"):
-                        firstNumber = model.division(firstNumber,secondNumber);
-                        break;
-                }
-                //Remove decimal places if the result is a whole number
-                if(firstNumber % 1 == 0){
-                    entry = String.format("%.0f",firstNumber) + e.getActionCommand();
-                } else {
-                    entry = String.valueOf(firstNumber) + e.getActionCommand();
-                }
-
+            if (operation == "÷" && secondNumberString.equals("0")) {
+                view.setDisplay("Cannot divide by zero");
+                reset();
             } else {
-                switch (e.getActionCommand()) {
-                    case ("+"):
-                        entry += "+";
-                        break;
-                    case ("-"):
-                        entry += "-";
-                        break;
-                    case ("x"):
-                        entry += "x";
-                        break;
-                    case ("÷"):
-                        entry += "÷";
-                        break;
+                if (!secondNumberString.equals("")) {
+                    calculate();
+                    operation = e.getActionCommand();
+                    secondNumberString = "";
+                    view.setDisplay(getExpression());
+                } else {
+                    operation = e.getActionCommand();
+                    view.setDisplay(getExpression());
                 }
             }
-            view.setDisplay(entry);
         }
+    }
+
+    public class equalButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (!operation.equals("") && !secondNumberString.equals("")) {
+                calculate();
+            }
+            view.setDisplay("=" + firstNumberString);
+            reset();
+        }
+    }
+
+    public class clearButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            reset();
+            view.setDisplay(getExpression());
+        }
+    }
+
+    public class clearEntryButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (operation.equals("")) {
+                firstNumberString = "0";
+            } else {
+                if (secondNumberString.equals("")) {
+                    operation = "";
+                } else {
+                    secondNumberString = "";
+                }
+            }
+            view.setDisplay(getExpression());
+        }
+    }
+
+    public class blackSpaceButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (operation.equals("")) {
+                if (firstNumberString.length() == 1 || firstNumberString.length() == 2 && firstNumberString.contains("-")) {
+                    firstNumberString = "0";
+                } else {
+                    firstNumberString = firstNumberString.substring(0, firstNumberString.length() - 1);
+                }
+            } else if (!secondNumberString.equals("")) {
+                if (secondNumberString.length() == 2 && secondNumberString.contains("-")){
+                    secondNumberString = "";
+                }
+                else{
+                    secondNumberString = secondNumberString.substring(0, secondNumberString.length() - 1);
+                }
+            }
+            view.setDisplay(getExpression());
+        }
+    }
+
+    public String getExpression() {
+        return firstNumberString + operation + secondNumberString;
+    }
+
+    public void calculate() {
+        firstNumber = Float.parseFloat(firstNumberString);
+        secondNumber = Float.parseFloat(secondNumberString);
+        switch (operation) {
+            case ("+"):
+                firstNumber = model.addition(firstNumber, secondNumber);
+                break;
+            case ("-"):
+                firstNumber = model.subtraction(firstNumber, secondNumber);
+                break;
+            case ("x"):
+                firstNumber = model.multiplication(firstNumber, secondNumber);
+                break;
+            case ("÷"):
+                firstNumber = model.division(firstNumber, secondNumber);
+                break;
+        }
+        //Remove 0 decimal places if result is a whole number
+        if (firstNumber % 1 == 0) {
+            firstNumberString = String.format("%.0f", firstNumber);
+        } else {
+            firstNumberString = String.valueOf(firstNumber);
+        }
+    }
+
+    public void reset() {
+        operation = "";
+        firstNumberString = "0";
+        secondNumberString = "";
+        firstNumber = 0;
+        secondNumber = 0;
     }
 }

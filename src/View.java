@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 
 public class View extends JFrame {
 
-    private JTextPane display;
+    private JTextArea display;
     private JButton[] numberButton;
     private JButton plusMinusButton;
     private JButton dotButton;
@@ -19,44 +19,45 @@ public class View extends JFrame {
     private JButton clearEntryButton;
     private JButton backspaceButton;
 
-    public View(){
+    public View() {
 
         //Default setting of frame
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setSize(400,450);
+        this.setSize(400, 450);
         this.setTitle("Calculator");
         this.setResizable(false);
         this.setLayout(new GridBagLayout());
-        Border rootBorder = BorderFactory.createEmptyBorder(5,5,5,5);
+        Border rootBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
         this.getRootPane().setBorder(rootBorder);
 
         //Create display
-        display = new JTextPane();
+        display = new JTextArea();
         GridBagConstraints displayGBC = new GridBagConstraints();
         displayGBC.gridx = 0;
         displayGBC.gridy = 0;
         this.add(display, displayGBC);
-        display.setPreferredSize(new Dimension(380,135));
+        display.setPreferredSize(new Dimension(380, 135));
         display.setBackground(Color.WHITE);
         Border displayBorder = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
         display.setBorder(displayBorder);
         display.setEditable(false);
-        display.setFont(new Font("Arial",Font.PLAIN,30));
+        display.setFont(new Font("Arial", Font.PLAIN, 30));
+        display.setLineWrap(true);
 
         //Create Button Panel
         JPanel buttonPanel = new JPanel();
         GridBagConstraints buttonPanelGBC = new GridBagConstraints();
         buttonPanelGBC.gridx = 0;
         buttonPanelGBC.gridy = 1;
-        buttonPanelGBC.insets = new Insets(5,0,0,0);
+        buttonPanelGBC.insets = new Insets(5, 0, 0, 0);
         this.add(buttonPanel, buttonPanelGBC);
-        buttonPanel.setPreferredSize(new Dimension(380,275));
+        buttonPanel.setPreferredSize(new Dimension(380, 275));
         //buttonPanel.setBackground(Color.YELLOW);
-        buttonPanel.setLayout(new GridLayout(5,4));
+        buttonPanel.setLayout(new GridLayout(5, 4));
 
         //Create number buttons
         numberButton = new JButton[10];
-        for(int i = 0; i < numberButton.length; i++){
+        for (int i = 0; i < numberButton.length; i++) {
             numberButton[i] = new JButton(String.valueOf(i));
         }
 
@@ -77,15 +78,15 @@ public class View extends JFrame {
         buttonPanel.add(clearEntryButton);
         buttonPanel.add(backspaceButton);
         buttonPanel.add(divideButton);
-        for(int i = 7; i <= 9; i++){
+        for (int i = 7; i <= 9; i++) {
             buttonPanel.add(numberButton[i]);
         }
         buttonPanel.add(multiplyButton);
-        for(int i = 4; i <= 6; i++){
+        for (int i = 4; i <= 6; i++) {
             buttonPanel.add(numberButton[i]);
         }
         buttonPanel.add(subtractButton);
-        for(int i = 1; i <= 3; i++){
+        for (int i = 1; i <= 3; i++) {
             buttonPanel.add(numberButton[i]);
         }
         buttonPanel.add(addButton);
@@ -95,7 +96,7 @@ public class View extends JFrame {
         buttonPanel.add(equalButton);
 
         //Set button font size
-        for(int i = 0; i < buttonPanel.getComponentCount(); i++) {
+        for (int i = 0; i < buttonPanel.getComponentCount(); i++) {
             buttonPanel.getComponent(i).setFont(new Font("", Font.BOLD, 20));
         }
 
@@ -104,23 +105,23 @@ public class View extends JFrame {
     }
 
     //Add action listener from controller to a button
-    public void addAction(JButton button, ActionListener action){
+    public void addAction(JButton button, ActionListener action) {
         button.addActionListener(action);
     }
 
-    public void setDisplay(String text){
+    public void setDisplay(String text) {
         display.setText(text);
     }
 
-    public JButton[] getNumberButton(){
+    public JButton[] getNumberButton() {
         return numberButton;
     }
 
-    public JButton getPlusMinusButton(){
+    public JButton getPlusMinusButton() {
         return plusMinusButton;
     }
 
-    public JButton getDotButton(){
+    public JButton getDotButton() {
         return dotButton;
     }
 
@@ -138,5 +139,21 @@ public class View extends JFrame {
 
     public JButton getDivideButton() {
         return divideButton;
+    }
+
+    public JButton getEqualButton() {
+        return equalButton;
+    }
+
+    public JButton getClearButton() {
+        return clearButton;
+    }
+
+    public JButton getClearEntryButton() {
+        return clearEntryButton;
+    }
+
+    public JButton getBackspaceButton() {
+        return backspaceButton;
     }
 }
