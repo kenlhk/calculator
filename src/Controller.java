@@ -200,6 +200,8 @@ public class Controller {
     public void calculate() {
         firstNumber = Float.parseFloat(firstNumberString);
         secondNumber = Float.parseFloat(secondNumberString);
+        System.out.println(firstNumber);
+        System.out.println(secondNumber);
         switch (operation) {
             case ("+"):
                 firstNumber = model.addition(firstNumber, secondNumber);
@@ -215,6 +217,7 @@ public class Controller {
                 break;
         }
         //Remove 0 decimal places if result is a whole number
+        System.out.println(firstNumber);
         if (firstNumber % 1 == 0) {
             firstNumberString = String.format("%.0f", firstNumber);
         } else {

@@ -12,3 +12,6 @@ higher order operations, such x to the power y.
 
 When will it be completed?<br />
 The project will be completed once the basic features is implemented.
+
+Basic features implemented on 03/01/2022:<br />
+![](calculator_demo.gif)
